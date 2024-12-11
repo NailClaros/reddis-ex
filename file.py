@@ -4,10 +4,11 @@ import json
 load_dotenv()
 
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
 print("Setting foo to bar")
 r.set('foo', 'bar')
 # True
-print(r.get('foo'))
+print("foo:" + r.get('foo'))
 
 print("\n\nTheoretical history logic--")
 print("""data=\n
