@@ -1,9 +1,22 @@
 from dotenv import load_dotenv
+import os
 import redis
 import json
 load_dotenv()
+"""Basic connection example.
+"""
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+#cloud sintance
+r = redis.Redis(
+    host=f'{os.getenv("host")}',
+    port=f'{os.getenv("port")}',
+    decode_responses=True,
+    username=f'{os.getenv("un")}',
+    password=f'{os.getenv("pw")}'
+    )
+
+#local instance
+# r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 print("Setting foo to bar")
 r.set('foo', 'bar')
