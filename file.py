@@ -44,6 +44,7 @@ print("""data=\n
       """)
 
 v1 = {
+    'code': 3,
     "songName": "Shape of You",
     "artistName": "Ed Sheeran",
     "songLang": "en",
@@ -53,6 +54,7 @@ v1 = {
   }
 
 v2 = {
+    "code": 3,
     "songName": "Perfect",
     "artistName": "Ed Sheeran",
     "songLang": "en",
@@ -61,8 +63,8 @@ v2 = {
     "song_key": "song:ijkl9012mnop3456"
   }
 
-r.set('song:abcd1234efgh5678', json.dumps(v1),ex=10)
-r.set('song:ijkl9012mnop3456', json.dumps(v2),ex=10)
+r.set('song:abcd1234efgh5678', json.dumps(v1))
+r.set('song:ijkl9012mnop3456', json.dumps(v2))
 
 print("creating a user 2452 with history []")
 r.set('2452', json.dumps([])) ##comment this line and rerun for viewing dup checks <-------------------------
@@ -80,17 +82,19 @@ def add_to_history(user_id, song_data, song_key):
     # Parse existing history or initialize an empty list if not found
     history = json.loads(existing_history) if existing_history else []
 
+    
     # Check for duplicates based on song name and artist name
     is_duplicate = any(
-        song['songName'] == song_data['songName'] and song['artistName'] == song_data['artistName']
+        isinstance(song, dict) and
+        song.get('songName') == song_data.get('songName') and
+        song.get('artistName') == song_data.get('artistName')
         for song in history
     )
 
+
     # If not a duplicate, add the new song data with the song_key
     if not is_duplicate:
-        song_data_with_key = song_data.copy()  # Create a copy of song_data
-        song_data_with_key['song_key'] = song_key  # Add the song_key to the data
-        history.append(song_data_with_key)  # Append the song to history
+        history.append(song_key)  # Append the song to history
 
         # Save the updated history back to Redis
         r.set(user_id, json.dumps(history))
@@ -104,4 +108,5 @@ print(f"2452:{r.get('2452')}")
 add_to_history('2452', v2, 'song:ijkl9012mnop3456')
 print("\nHistory-------")
 for song in json.loads(r.get('2452')):
-    print(song, end="\n\n")
+    print(song)
+    print(r.get(song), end="\n\n")
